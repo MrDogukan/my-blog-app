@@ -11,6 +11,9 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../utils/firebaseUtil";
 
 function Copyright(props) {
   return (
@@ -33,25 +36,22 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function Register() {
-  const [firstName, setFirstName] = React.useState();
-  const [lastName, setLastName] = React.useState();
-  const [email, setEmail] = React.useState();
-  const [password, setPassword] = React.useState();
+  const [firstName, setFirstName] = useState();
+  const [lastName, setLastName] = useState();
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
 
-  const handlesubmit = () => {
-    console.log(firstName, lastName, email, password);
+  const handleSubmit = async (event) => {
+    try {
+      event.preventDefault();
+      let user = await createUserWithEmailAndPassword(auth, email, password);
+      navigate("/login");
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
   const navigate = useNavigate();
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
-  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -71,12 +71,7 @@ export default function Register() {
           <Typography component="h1" variant="h5">
             Register
           </Typography>
-          <Box
-            component="form"
-            noValidate
-            onSubmit={handleSubmit}
-            sx={{ mt: 3 }}
-          >
+          <Box component="form" noValidate sx={{ mt: 3 }}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
@@ -126,7 +121,7 @@ export default function Register() {
               </Grid>
             </Grid>
             <Button
-              onClick={handlesubmit}
+              onClick={handleSubmit}
               type="submit"
               fullWidth
               variant="contained"

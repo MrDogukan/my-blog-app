@@ -13,6 +13,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@mui/material";
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContextProvider";
+import { signOut } from "firebase/auth";
+import { auth } from "../utils/firebaseUtil";
 
 const MyImg = styled("img")({
   width: 30,
@@ -21,6 +23,10 @@ const MyImg = styled("img")({
 export default function Navbar() {
   const navigate = useNavigate();
   const { currentUser } = useContext(AuthContext);
+
+  const signOutFunc = async () => {
+    await signOut(auth);
+  };
 
   const [anchorEl, setAnchorEl] = React.useState(null);
 
@@ -80,7 +86,7 @@ export default function Navbar() {
                 onClose={handleClose}
               >
                 <MenuItem onClick={handleClose}>Profile</MenuItem>
-                <MenuItem onClick={handleClose}>Logout</MenuItem>
+                <MenuItem onClick={() => signOutFunc()}>Logout</MenuItem>
               </Menu>
             </div>
           ) : (

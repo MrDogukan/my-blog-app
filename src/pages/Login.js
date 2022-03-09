@@ -13,6 +13,9 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "../utils/firebaseUtil";
 
 function Copyright(props) {
   return (
@@ -35,15 +38,16 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function Login() {
+  const [email, setEmail] = useState();
+  const [password, setPassword] = useState();
+
   const navigate = useNavigate();
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get("email"),
-      password: data.get("password"),
-    });
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      let user = await signInWithEmailAndPassword(auth, email, password);
+      navigate("/");
+    } catch (error) {}
   };
 
   return (
@@ -82,12 +86,7 @@ export default function Login() {
             <Typography component="h1" variant="h5">
               Login
             </Typography>
-            <Box
-              component="form"
-              noValidate
-              onSubmit={handleSubmit}
-              sx={{ mt: 1 }}
-            >
+            <Box component="form" noValidate sx={{ mt: 1 }}>
               <TextField
                 margin="normal"
                 required
@@ -97,6 +96,7 @@ export default function Login() {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                onChange={(e) => setEmail(e.target.value)}
               />
               <TextField
                 margin="normal"
@@ -107,12 +107,14 @@ export default function Login() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
+                onChange={(e) => setPassword(e.target.value)}
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"
               />
               <Button
+                onClick={handleSubmit}
                 type="submit"
                 fullWidth
                 variant="contained"
